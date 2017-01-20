@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<!--
+ - @file index.html
+ -
+ - @brief fichier contenant le Dispatcher de Tank
+ -
+ - @author Adrien derouéné & Jérome De Kerautem
+ - @version 1.0
+ - @date 13/10/2016
+ - @copyright BSD 3-Clause
+ - -->
+
+<html>
+    <head>
+      <title>RecifalX</title>
+
+      <!--Let browser know that website is optimized for mobile-->
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+      <meta name="format-detection" content="telephone=yes">
+      <meta name="msapplication-tap-highlight" content="no">
+
+      <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
+
+      <script type="text/javascript" src="cordova.js"></script>
+      <script type="text/javascript" src="js/app_with_chrome_sockets.js"></script>
+      <script type="text/javascript" src="lib/jquery.mobile.custom.min.js"></script>
+      <script type="text/javascript" src="js/index.js"></script>
+
+      <script src="lib/materialize.min.js"></script>
+      <script type="text/javascript" src="lib/materialize.js"></script> 
+      <script src="lib/jquery.mobile-1.4.5.min.js"></script>
+      <script type="text/javascript" src="lib/fastclick.js"></script>
+      <script type="text/javascript" src="lib/jquery.flot.js"></script>
+
+      <link rel="stylesheet" type="text/css" href="css/index.css">
+      <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons-1.4.0.css">
+      <link rel="stylesheet" type="text/css" href="css/jquery.mobile.custom.structure.min.css"/>
+      <link rel="stylesheet" type="text/css" href="css/jquery.mobile.custom.theme.min.css"/>
+
+      <!--Import Google Icon Font-->
+      <link type="text/css" rel="stylesheet"  href="css/fontFamily.css">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+  </head>
+
+  <body>
+
+
+
+<!-- Page 1 - Accueil. -->
+  <div data-role="page" id="pageone">
+    <div data-role="header">
+      <h1>Accueil</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+          <div id="temperature" class="temperature" style="width:600px;height:300px">
+
+          </div>  
+          <div class="Other">
+            <div class="A">
+              <div class="A1">
+                      <div>
+                          <a id= "carre" name="a1" href="#pagefour" class="btn-large btn-floating waves-effect waves-light yellow" ></a>
+                          <p id="menu1" class="AccueilName" type="text">Maintenances</p>
+                      </div>
+                      <div>
+                          <a id= "carre" name="a2" href="#pagethree" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <p id="menu2" class="AccueilName" type="text">Groupes</p>
+
+                      </div> 
+              </div>
+              <div class="A2">
+                      <div>
+                          <a id= "carre" name="a3" href="#pagesix" class="btn-large btn-floating waves-effect waves-light yellow" onclick=""></a>
+                          <p id="menu3" class="AccueilName" type="text">Relais</p>
+
+                      </div> 
+                      <div>
+                          <a id= "carre" name="a4" href="#pagefive" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <p id="menu4" class="AccueilName" type="text">Temperature</p>
+                      </div>
+
+              </div>
+              <div class="A3">
+                      <div>
+                          <a id= "carre" name="a5" href="#pagetwo" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <p id="menu4" class="AccueilName" type="text">Configurations</p>
+                      </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scrollingMessage">
+            <div id="wrapper">
+              <div id="scroller">
+                 <ul id="custom" data-role="listview" dat-inset="true" class="thelist" width="100%" style="margin: 0 !important;"> 
+
+                 </ul>
+
+              </div>
+
+            </div>
+          </div>
+
+      </div>
+    <div id="footer" data-role="footer">
+        <a id="date" class"footer" align="right" height="5%"></a>
+    </div>
+  </div> 
+
+
+
+<!-- Page 2 - Menu configuration. -->
+  <div data-role="page" id="pagetwo">
+    <div data-role="header">
+      <h1>Menu configuration</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <div class="thisnogood">
+              <a id= "carre" name="c1" href="#pageseven" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+              <p id="cin1" class="configName" type="text" >Configuration relais</p>
+        </div>
+        <div class="thisnogood">
+              <a id= "carre" name="c2" href="#pageeight" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+              <p id="cin2" class="configName" type="text" >Configuration maintenance</p>
+        </div>
+        <div class="thisnogood">
+              <a id= "carre" name="c3" href="#pagenine" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+              <p id="cin3" class="configName" type="text" >Configuration test</p>
+        </div>
+    </div>
+    <div id="footer" data-role="footer">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+
+
+<!-- Page 3 - Controle groupe.-->
+  <div data-role="page" id="pagethree">
+    <div data-role="header">
+      <h1>Group Control</h1>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      
+      <label for="select-choice-8" class="select">Multi-select with optgroups, custom icon and position:</label>
+      <select name="select-choice-8" id="select-choice-8" multiple="multiple" data-native-menu="false" data-icon="grid" data-iconpos="left">
+          <option>Selectionner un ou plusieurs relais :</option>
+
+      </select>
+
+      <div id="div_body" class="container">
+
+
+      </div>
+
+      <div>
+        <a id="button_add" class="btn-floating waves-effect waves-light white secondary" data-rel="dialog" data-position-to="window" data-transition="pop" type="button" onclick="submit();" > <i class="material-icons blue">add</i></a>
+        <a id="button_rm" class="btn-floating waves-effect waves-light white secondary" data-rel="dialog" data-position-to="window" data-transition="pop" type="button" onclick="removeButton();" > <i class="material-icons red">remove</i></a>
+      </div>
+    </div>
+    <div id="footer" data-role="footer">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+
+
+<!-- Page 4 - Maintenances.-->
+  <div data-role="page" id="pagefour" data-theme="a">
+    <div data-role="header" data-theme="a">
+      <h1>Maintenances</h1>
+    </div>
+
+    <div data-role="main" class="ui-content" data-theme="a">
+        <ul data-role="listview" data-inset="true" data-divider-theme="a"> 
+          <div id="collapsible" data-role="collapsible-set" data-content-theme="d">
+
+          </div>
+        </ul>
+    </div>
+
+    <div id="footer" data-role="footer" data-theme="a">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+
+
+<!-- Page 5 - Température.-->
+  <div data-role="page" id="pagefive">
+    <div data-role="header">
+      <h1>Température</h1>
+    </div>
+
+    <div data-role="main" class="ui-content">
+
+    </div>
+
+    <div id="footer" data-role="footer">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+
+
+  <!-- Page 6 - Relais. -->
+  <div data-role="page" id="pagesix">
+    <div data-role="header">
+      <h1>Controle relais</h1>
+    </div>
+    <div data-role="main" class="ui-content">
+        <div class="L">
+            <div class="L1">
+                    <div class="thisnogood">
+                        <a id= "carre" name="r0" href="#!" class="btn-large btn-floating waves-effect waves-light relay" ></a>
+                        <p id="in0" class="pNameButton" type="text">Relais 1</p>
+                    </div>
+                    <div class="thisnogood">
+                        <a id= "carre" name="r1" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in1" class="pNameButton" type="text">Relais 2</p>
+                    </div>
+                    <div class="thisnogood">
+                        <a id= "carre" name="r2" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in2" class="pNameButton" type="text">Relais 3</p>
+                    </div>  
+                    <div class="thisnogood">
+                        <a id= "carre" name="r3" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in3" class="pNameButton" type="text">Relais 4</p>
+                    </div>
+            </div>
+     
+            <div class="L2">
+                  <div class="thisnogood">
+                          <a id= "carre" name="r4" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                          <p id="in4" class="pNameButton" type="text">Relais 5</p>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="r5" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                          <p id="in5" class="pNameButton" type="text">Relais 6</p>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="r6" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                          <p id="in6" class="pNameButton" type="text">Relais 7</p>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="r7" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                          <p id="in7" class="pNameButton" type="text">Relais 8</p>
+                   </div>
+            </div>
+
+            <div class="L3">
+                  <div class="thisnogood">
+                        <a id= "carre" name="r8" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in8" class="pNameButton" type="text">Relais 9</p>
+                  </div>
+
+                  <div class="thisnogood">
+                        <a id= "carre" name="r9" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in9" class="pNameButton" type="text" >Relais 10</p>
+                  </div>
+                  <div class="thisnogood">
+                        <a id= "carre" name="r10" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in10" class="pNameButton" type="text" >Relais 11</p>
+                  </div>
+                  <div class="thisnogood">
+                        <a id= "carre" name="r11" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in11" class="pNameButton" type="text" >Relais 12</p>
+                  </div>
+            </div>
+
+            <div class="L4">
+                  <div class="thisnogood">
+                        <a id= "carre" name="r12" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in12" class="pNameButton" type="text" >Relais 13</p>
+                  </div>           
+                  <div class="thisnogood">
+                        <a id= "carre" name="r13" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in13" class="pNameButton" type="text" >Relais 14</p>
+                  </div>             
+                  <div class="thisnogood">
+                        <a id= "carre" name="r14" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in14" class="pNameButton" type="text" >Relais 15</p>
+                  </div>          
+                  <div class="thisnogood">
+                        <a id= "carre" name="r15" href="#!" class="btn-large btn-floating waves-effect waves-light relay"></a>
+                        <p id="in15" class="pNameButton" type="text" >Relais 16</p>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" data-role="footer">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+<!-- Page 7 - Configuration des relais.-->
+  <div data-role="page" id="pageseven">
+    <div data-role="header">
+      <h1>Configuration nom relais</h1>
+    </div>
+
+    <div data-role="main" class="ui-content">
+        <div class="L">
+            <div class="L1">
+                    <div class="thisnogood">
+                        <a id= "carre" name="rc0" href="#!" class="btn-large btn-floating waves-effect waves-light yellow" ></a>
+                        <input id="in0" name="relayName" class="inputNameButton" type="text" value="Relais 1" maxlength="10"></input>
+                    </div>
+                    <div class="thisnogood">
+                        <a id= "carre" name="rc1" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in1" name="relayName" class="inputNameButton" type="text" value="Relais 2" maxlength="10"></input>
+
+                    </div>
+                    <div class="thisnogood">
+                        <a id= "carre" name="rc2" href="#!" class="btn-large btn-floating waves-effect waves-light yellow" onclick=""></a>
+                        <input id="in2" name="relayName" class="inputNameButton" type="text" value="Relais 3" maxlength="10"></input>
+
+                    </div>
+                    <div class="thisnogood">
+                        <a id= "carre" name="rc3" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in3" name="relayName" class="inputNameButton" type="text" value="Relais 4" maxlength="10"></input>
+                    </div>
+            </div>
+     
+            <div class="L2">
+                  <div class="thisnogood">
+                          <a id= "carre" name="rc4" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <input id="in4" name="relayName" class="inputNameButton" type="text" value="Relais 5" maxlength="10"></input>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="rc5" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <input id="in5" name="relayName" class="inputNameButton" type="text" value="Relais 6" maxlength="10"></input>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="rc6" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <input id="in6" name="relayName" class="inputNameButton" type="text" value="Relais 7" maxlength="10"></input>
+                   </div>
+                   <div class="thisnogood">
+                          <a id= "carre" name="rc7" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                          <input id="in7" name="relayName" class="inputNameButton" type="text" value="Relais 8" maxlength="10"></input>
+                   </div>
+            </div>
+
+            <div class="L3">
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc8" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in8" name="relayName" class="inputNameButton" type="text" value="Relais 9" maxlength="10"></input>
+                  </div>
+
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc9" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in9" name="relayName" class="inputNameButton" type="text" value="Relais 10" maxlength="10"></input>
+                  </div>
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc10" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in10" name="relayName" class="inputNameButton" type="text" value="Relais 11" maxlength="10"></input>
+                  </div>
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc11" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in11" name="relayName" class="inputNameButton" type="text" value="Relais 12" maxlength="10"></input>
+                  </div>
+            </div>
+
+            <div class="L4">
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc12" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in12" name="relayName" class="inputNameButton" type="text" value="Relais 13" maxlength="10"></input>
+                  </div>           
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc13" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in13" name="relayName" class="inputNameButton" type="text" value="Relais 14" maxlength="10"></input>
+                  </div>             
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc14" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in14" name="relayName" class="inputNameButton" type="text" value="Relais 15" maxlength="10"></input>
+                  </div>          
+                  <div class="thisnogood">
+                        <a id= "carre" name="rc15" href="#!" class="btn-large btn-floating waves-effect waves-light yellow"></a>
+                        <input id="in15" name="relayName" class="inputNameButton" type="text" value="Relais 16" maxlength="10"></input>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" data-role="footer">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+<!-- Page 8 - Configuration maintenances.-->
+  <div data-role="page" id="pageeight" data-theme="a">
+    <div data-role="header" data-theme="a">
+      <h1>Configuration des maintenances</h1>
+    </div>
+
+    <div data-role="main" class="ui-content" data-theme="a">
+        <ul data-role="listview" data-inset="true" data-divider-theme="a"> 
+          <div id="configCollapsible" data-role="collapsible-set" data-content-theme="d">
+
+          </div>
+        </ul>
+    </div>
+
+    <div id="footer" data-role="footer" data-theme="a">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+<!-- Page 9 - Test.-->
+  <div data-role="page" id="pagenine" data-theme="a">
+    <div data-role="header" data-theme="a">
+      <h1>Test</h1>
+    </div>
+
+    <div data-role="main" class="ui-content" data-theme="a">
+      <div class="container">
+        <div class="row">
+            <div class='col-md-6'>
+            <div class="form-group">
+                <label for="" class="">Select Colour</label>
+                    <div class="dropdown">
+                      <button class="btn _select_color dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Green<span class="caret _right"></span>
+                      <span _text_display="Green" class="color green"></span></button>
+                      <ul class="dropdown-menu _select_color_drop" aria-labelledby="dropdownMenu1">
+                          <li><span _text_display="Green" class="color green"></span></li>
+                          <li><span _text_display="Red" class="color red"></span></li>
+                          <li><span _text_display="Yellow" class="color yellow"></span></li>
+                          <li><span _text_display="Brown" class="color brown"></span></li>
+                          <li><span _text_display="Orange" class="color orange"></span></li>
+                          <li><span _text_display="Pink" class="color pink"></span></li>
+                          <li><span _text_display="Silver" class="color silver"></span></li>
+                          <li><span _text_display="Bule" class="color blue"></span></li>
+                          <li><span _text_display="TEAL" class="color TEAL"></span></li>
+                          <li><span _text_display="NAVY" class="color NAVY"></span></li>
+                          <li><span _text_display="PURPLE" class="color PURPLE"></span></li>
+                          <li><span _text_display="OLIVE" class="color OLIVE"></span></li>
+                          <li><span _text_display="LIME" class="color LIME"></span></li>
+                      <input type="hidden" name="_color" value="Green"></ul>
+                    </div>
+                  </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer" data-role="footer" data-theme="a">
+        <a href="#pageone" data-transition="slide" data-direction="reverse">Retour à l'accueil</a>
+    </div>
+  </div> 
+
+
+  </body>
+</html>
+
+
+
+  

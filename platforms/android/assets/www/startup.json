@@ -1,0 +1,50 @@
+/* Fichier JSON d'initialisation: le serveur envoie:
+ * element:[
+ * 	{name:nom, state:on, type:chauffage}
+ * ]
+ */
+
+
+
+{
+	"elements":[
+		{"name": "ecumeur", "state": "off", "type": "actuator"},
+		{"name": "pompe", "state": "on", "type": "actuator"},
+		{"name": "thermometre", "state": "on", "type": "sensor"}
+	],
+
+	"groups":[
+		{"group":["ecumeur","pompe"] },
+		{"group":["thermometre"]}
+	],
+
+	"maintenance":[
+		{"name":"ecumeur", "activated":"yes", "period":4, "color":"blue"},
+		{"name":"pompe", "activated":"no", "period":5, "color":"orange"},
+		{"name":"chauffage", "activated":"no", "period":2, "color":"pink"}
+	],
+
+	"errors":{
+		"color":"red"
+	},
+
+	"temperature":25, "timestamp":16.30
+}
+
+
+
+{
+	"groups":[
+		{"id":"in117", "value":"carotte", "relays":["r0","r5","r12"], "buttonID":"input_1" },
+		{"id":"in217", "value":"ecumeurs", "relays":["r3","r7"], "buttonID":"input_2" }
+	]
+}
+
+{
+	"r0":"nom0",
+	"r1":"ecumeur1",
+
+	"r4":"",
+
+	"r15":"pompe2"
+}
