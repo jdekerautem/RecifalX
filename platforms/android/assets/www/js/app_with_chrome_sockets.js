@@ -76,8 +76,11 @@ var app = {
             // console.log('Ajout listeners sur noms des boutons '+i);
         }
 
-        /* Ajout listener sur le bouton des groupes */
+        /* Ajout listener sur le bouton de l'accueil vers la page des groupes */
         document.getElementsByName('a2')[0].addEventListener('click', searchForExceptionsInGroups);
+
+        /* Ajout listener sur le bouton dans le menuconfig pour changer l'adresse IP */
+        document.getElementById('configIP').addEventListener('click', onClickIPConfiguration);
 
         // localStorage.clear(); // A enlever dans la version finale
         
@@ -87,6 +90,12 @@ var app = {
             console.log('localStorage exists, length > 0');
 
             console.log(localStorage.getItem('relays'));
+
+            /* Actualisation de l'adresse IP par défaut */
+            var ip = localStorage.getItem(ipAddress);
+            if (ip != null) {
+                DEFAULT_IP_ADDRESS = ip;
+            }
             
             /* Récupération des noms des boutons relais */
             var relay_storage = JSON.parse(localStorage.getItem('relays'));
@@ -100,6 +109,10 @@ var app = {
                         /* Modification de l'innerHTML de la balise <p> */
                         var p_tag = document.getElementById("in"+ i);
                         p_tag.innerHTML = relay_storage[relayTagName];
+
+                        /* Modification de l'attribut 'value' des inputs des noms des relais dans le menuconfig */
+                        var input_tag = document.getElementById("cr"+i);
+                        input_tag.value = relay_storage[relayTagName];
                     }
                 }
             }
@@ -260,8 +273,7 @@ function retryConnectOnFailure(){
                     }
                 }
             );
-            if (countConnectionFailures > 50) {RETRY_DELAY_MS = 15000;}
-            if (countConnectionFailures > 100) {clearTimeout(retryConnect);}
+            if (countConnectionFailures > 50) {clearTimeout(retryConnect);}
             retryConnectOnFailure();
         }
     }, RETRY_DELAY_MS);
@@ -278,7 +290,7 @@ function manageSocket(action, optionalParameter){
         socket = new Socket();
         retryConnectOnFailure();
         console.log('valeur is_connected: '+is_connected);
-        // is_connected = true; // TEST PURPOSE ONLY
+        is_connected = true; // TEST PURPOSE ONLY
     
     /* SI la connexion est établie mais que l'action ne provient pas d'un bouton */
     /* on n'entrera jamais dans cette branche */
@@ -346,8 +358,7 @@ function manageSocket(action, optionalParameter){
       dataToString = String.fromCharCode.apply(String, data);
 
       /* Découpage du string en sous-string, chacun contenant un seul objet JSON. */
-      // var stringSliced;
-      // if (dataToString.)
+      // Dépend de ce que fera Raphaël du côté du serveur...
 
       var jsonObject = JSON.parse(dataToString);
 
@@ -459,8 +470,8 @@ function displayTemperature(dataTemperature){
         var xaxis_min = temp_10[0][0];
 
         var xaxis_min_full = 0;
-        if (tempDataPoints.length > 10) {
-            xaxis_min_full = tempDataPoints.length - 10;
+        if (tempDataPoints.length > 100) {
+            xaxis_min_full = tempDataPoints.length - 100;
         }
 
         $.plot("#temperature", 
@@ -645,5 +656,18 @@ function searchForExceptionsInGroups(){
                 j++;
             }
         }
+    }
+}
+
+/**
+ * Fonction gérant le changement de l'adresse IP sur la page menuconfig
+ */
+function onClickIPConfiguration() {
+    var configIP = window.prompt('Entrez la nouvelle adresse IP du serveur: ', localStorage.getItem(ipAddress));
+
+    if (checkIPAgainstRegex(configIP)) {
+        localStorage.setItem(ipAddress, configIP);
+        console.log(localStorage.getItem(ipAddress));
+        retryConnectOnFailure();
     }
 }

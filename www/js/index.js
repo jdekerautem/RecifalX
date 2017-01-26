@@ -38,7 +38,8 @@ $(document).ready(function()
         })
     };
     <!-- _________________TEST_____________________ -->
-
+    
+    setOptions();
     initializeIndex();
 
 
@@ -272,6 +273,7 @@ function setDate(id, avecH)
 /**
  * @brief setOption.
  * @details Ajoute les divers options possibles dans la liste. 
+ * 
  */
 function setOptions()
 {
@@ -285,13 +287,36 @@ function setOptions()
         $("#select-choice-8").append('<option value=' + buttonsNames[i].name + '>' + inputsNames[i].textContent + '</option>');
         // console.log("Le nom : " + buttonsNames[i].name + " et la valeur :" + inputsNames[i-5].innerText);
     }
-    
+
+    $("#select-choice-8").append('<option value="monRetour">Return</option>');
+
+    $("#select-choice-8").click(function(){
+       $('#select-choice-8 option').attr('selected', false); 
+        alert("Tu as cliquer seulement sur la barre !!!!");
+
+    })
+
+    $("#select-choice-8").change(function(){
+      var values = $('#select-choice-8').val();
+      console.log(values.length);
+      if (values !== null) {
+        for (var i = 0; i < values.length; i++) {
+          if (values[i] == "monRetour") {
+            $('#select-choice-8').find('[value="monRetour"]').prop('selected', false);
+            parent.history.back();
+          }
+        }
+
+      }
+
+    });
 
 }
 
 /**
  * @brief cleanSelect.
  * @details Clean le menu déroulant, pour choisir les options. 
+ * 
  */
 function cleanSelect()
 {
@@ -314,6 +339,14 @@ function submit()
   var values = $('#select-choice-8').val();
   var select = document.getElementById('select-choice-8');
   var length = select.options.length;
+  console.log("mes valeurs : " + values);
+  if (values !== null) {
+    for (var i= 0; i < values.length; i++) {
+      if (values[i] === "monRetour") {
+          values.splice(i, 1);
+      }
+    }
+  }
 
   console.log("You selected these options : " + values);
   
