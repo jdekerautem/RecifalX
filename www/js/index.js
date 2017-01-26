@@ -10,7 +10,7 @@
  */
 
 /**
- * Fonction d'initialisation du fichier index.js.
+ * @details Fonction d'initialisation du fichier index.js.
  *
  */
 $(document).ready(function()
@@ -39,32 +39,25 @@ $(document).ready(function()
     };
     <!-- _________________TEST_____________________ -->
 
-
-    setDate ('date', "oui");
-    setOption();
+    initializeIndex();
 
 
-    ajoutMaintenance("Maintenance 13", 1, 30, 13);
-    ajoutMaintenance("Maintenance 14", 1, 30, 14);
-    ajoutMaintenance("Maintenance 15", 0, 30, 15);
-    ajoutMaintenance("Maintenance 16", 1, 30, 16);
-
-    addMessage ("Mnull", "Aucun nouveau message !");
-    maintenanceAFaire("Maintenance 13", "Maintenance 13");
-
-    console.log("Le nombre d'élement " + localStorage.length);
-    var elements;
-    var jsonelements;
-    for (var i = 0; i < localStorage.length; i++){
-        elements += localStorage.getItem(localStorage.key(i));
-    }
-    jsonelements = JSON.stringify(elements);
-    console.log("Mon contenu " + jsonelements);
+    storageContains("all");
 
 });
 
+function initializeIndex() {
+    setDate ('date', "oui");
+    var json = '{"action" : "N_MAINT", "id" : 2, "name" : "Poisson", "nextMaintenance" : "10:21:01:2017", "period" : 30, "color" : 4, "state" : 1}';
+    addMaintenance(json);
+    addMessage ("Mnull", "Aucun nouveau message !");
+    maintenanceToBeDone("2", "Maintenance 14");
+}
+
 /*
- * Ajoute un bloc comportant comprenant un div et un bouton. Le div en question peut accueillir jusqu'à deux boutons.
+ * @brief addBloc.
+ * @details Ajoute un bloc comportant comprenant un div et un bouton. Le div en question peut accueillir jusqu'à deux boutons.
+ * 
  * @param name
  * @param values
  * @param initialisation, variable permettant de vérifier que les boutons n'ont pas déjà été créés
@@ -121,15 +114,16 @@ function addBloc(name, values, initialisation)
 
 } 
 
-/*
- * Créer un div  dans la page Groupe (fonction appelé dans addBloc()).
+/**
+ * @brief addDiv.
+ * @details Créer un div  dans la page Groupe (fonction appelé dans addBloc()).
  *
- * @param name
+ * @param number
  * @param result
  * @param values
  * @param initialisation, variable permettant de vérifier que les boutons n'ont pas déjà été créés
  */
-function addDiv (number, result, values, initialisation) 
+function addDiv(number, result, values, initialisation) 
 {
     console.log("Add div. ");
 
@@ -156,14 +150,17 @@ function addDiv (number, result, values, initialisation)
 
 }
 
-/* Ajoute un bouton dans un div (fonction appelé dans addBloc()).
- *
- * @param name
+/**
+ * @brief addButton.
+ * @details Ajoute un bouton dans un div (fonction appelé dans addBloc()).
+ * 
+ * @param ref
+ * @param count
  * @param result
  * @param values
  * @param initialisation, variable permettant de vérifier que les boutons n'ont pas déjà été créés
  */
-function addButton (ref, count, result, values, initialisation) 
+function addButton(ref, count, result, values, initialisation) 
 {
     console.log("Mes paramètres : ref : " + ref + ", count : " + count + ", result : " + result +". ");
     console.log("Add button. ");
@@ -206,9 +203,7 @@ function addButton (ref, count, result, values, initialisation)
 
 
       var new_group = {"id":myP.id, "value":myP.value, "relays":values, "buttonID":myA };
-
       json_groups.groups.push(new_group);
-    
       localStorage.setItem('groups', JSON.stringify(json_groups));
     }
 
@@ -242,13 +237,15 @@ function addButton (ref, count, result, values, initialisation)
     return myA;
 }
 
-/* Insert la date du device dans un item (à l'id passer en paramètre).
+/**
+ * @brief setDate
+ * @details Insert la date du device dans un item (à l'id passer en paramètre).
  * Le deuxième paramètre permet de définir si on souhaite afficher l'heure ou non.
  * 
  * @param id
  * @param avecH, pour choisir si on veut prendre les heures avec ou non.
  */
-function setDate (id, avecH) 
+function setDate(id, avecH) 
 {
       var now = new Date();
       var setdate = document.getElementById(id);
@@ -273,10 +270,10 @@ function setDate (id, avecH)
 }
 
 /**
- * Ajoute les divers options possibles dans la liste. 
- *
+ * @brief setOption.
+ * @details Ajoute les divers options possibles dans la liste. 
  */
-function setOption ()
+function setOptions()
 {
     var inputsNames = document.getElementsByClassName('pNameButton');
     var buttonsNames = document.getElementsByClassName('relay');
@@ -293,20 +290,22 @@ function setOption ()
 }
 
 /**
- * Clean le menu déroulant, pour choisir les options. 
+ * @brief cleanSelect.
+ * @details Clean le menu déroulant, pour choisir les options. 
  */
-function cleanSelect ()
+function cleanSelect()
 {
   $("#select-choice-8")
       .find('option')
       .remove()
       .end()
   ;
-  setOption();
+  setOptions();
 }
 
 /**
- * Fonction permerrant de capturer la selection dans la liste des groupes.
+ * @brief submit.
+ * @details Fonction permerrant de capturer la selection dans la liste des groupes.
  */
 function submit()
 {
@@ -331,12 +330,13 @@ function submit()
 }
 
 /**
- *Ajoute un message dans la liste sur l'écran d'accueil.
+ * @brief addMessage.
+ * @details Ajoute un message dans la liste sur l'écran d'accueil.
  *  
  * @param id
  * @param message
  */
-function addMessage (id, message) 
+function addMessage(id, message) 
 {
     var maListe = document.getElementById('custom');
 
@@ -361,7 +361,8 @@ function addMessage (id, message)
 }
 
 /**
- * Supprime un message de la liste des messages sur l'écran d'accueil.
+ * @brief removeMessage.
+ * @details Supprime un message de la liste des messages sur l'écran d'accueil.
  *
  * @param id
  */
@@ -394,89 +395,126 @@ function removeMessage(id)
 }
 
 /**
- * Ajoute une maintenance dans la liste des maintenances.
- * @param message
- * @param activate
- * @param jour
- * @param id
+ * @brief addMaintenance.
+ * @details Ajoute une maintenance dans la liste des maintenances.
+ * @param jsonString
  */
-function ajoutMaintenance(message, activate, jour, id)
+function addMaintenance(jsonString)
 {
-  var powerId = "Power" + id;
-  var colorId = "Color" + id;
-  var collapseItem = "<div id=\"collapsible" + id + "\" data-role=\"collapsible\" data-collapsed=\"true\" data-theme=\"a|b\" data-mini=\"true\"><h5 id=\"Acquit1\" data-theme=\"b\" class=\"\"> Maintenances 1 </h5><ul data-role=\"listview\" data-inset=\"true\" data-divider-theme=\"a\"> <li><a href=\"#\"><h2>Activer la maintenance.</h2></a><a id=\"" + powerId + "\" href=\"#\" data-icon=\"power\" class=\"green\"></a></li><li><a href=\"#\"><h2>Changer la couleur de la maintenance</h2></a><a id=\"" + colorId + "\" href=\"#\" data-icon=\"clock\" class=\"orange\"></a></li></ul></div>"
+  /* Voir pour stocker les couleurs et la date de la dernière maintenance. */
+  var jsonObject = JSON.parse(jsonString);
 
+  localStorage.setItem(jsonObject.id, jsonString);
+  console.log(localStorage.getItem(jsonObject.id));
+
+  storageContains("all");
+
+  console.log("L'id stocké : " + jsonObject.id);
+
+  var powerId = "Power" + jsonObject.id;
+  var colorId = "Color" + jsonObject.id;
+  var collapseItem = "<div id=\"configCollapsible" + jsonObject.id + "\" data-role=\"collapsible\" data-collapsed=\"true\" data-theme=\"a|b\" data-mini=\"true\"><h5 id=\" " + jsonObject.name + " \" data-theme=\"b\" class=\"\"> Maintenances " + jsonObject.id + " </h5><ul data-role=\"listview\" data-inset=\"true\" data-divider-theme=\"a\"> <li><a href=\"#\"><h2>Activer la maintenance.</h2></a><a id=\"" + powerId + "\" href=\"#\" data-icon=\"power\" class=\"green\"></a></li><li><a href=\"#\"><h2>Changer la couleur de la maintenance</h2></a><a id=\"" + colorId + "\" href=\"#\" data-icon=\"clock\" class=\"orange\"></a></li></ul></div>"
+  
+  console.log("L'état de la maintenance : " + jsonObject.state);
   $("#configCollapsible").append( collapseItem );
-  if(activate === 1) {
-      addCollapseItem(message, id, jour);
+  if(jsonObject.state == 1) {
+      console.log("On passe dans l'état : " + jsonObject.state);
+      addMaintenanceActivated(jsonObject.id, jsonObject.name, jsonObject.period);
   }
 
   console.log("colorId : " + colorId);
   var myButtonColor = document.getElementById(colorId);
-  myButtonColor.addEventListener('click', function(){
-    changerCouleur(colorId);
+  myButtonColor.addEventListener('click', function(srcElement){
+    changerCouleur(colorId, srcElement);
   });
 
   var myButtonPower = document.getElementById(powerId);
-  console.log("reportId : " + powerId);
-  myButtonPower.addEventListener('click', function(){
-    activerMaintenance(powerId);
+  console.log("powerId : " + powerId);
+  myButtonPower.addEventListener('click', function(srcElement){
+    activateMaintenance(powerId, srcElement);
   });
 
 }
 
 /**
- * Ajoute un item dans la liste des maintenances.
+ * @brief addMaintenanceActivated.
+ * @details Ajoute un item dans la liste des maintenances.
  *  
  * @param id 
- * @param message
- * @param jour
+ * @param name
+ * @param period
  */
-function addCollapseItem(id, message, jour)
+function addMaintenanceActivated(id, name, period)
 {
     var acquitId = "Acquit" + id;
     var reportId = "Report" + id;
-    var collapseItem = "<div id=\"collapsible" + id + "\" data-role=\"collapsible\" data-collapsed=\"true\" data-theme=\"a|b\" data-mini=\"true\"><h5 id=\"Alert" + id + "\" data-theme=\"b\" class=\"ui-btn ui-btn-b ui-icon-alert ui-btn-icon-right\">" + id + " </h5><ul data-role=\"listview\" data-inset=\"true\" data-divider-theme=\"a\"> <li><a href=\"#\"><h2>Acquittement</h2></a><a id=\"" + acquitId + "\" href=\"#\" data-icon=\"check\" class=\"green\"></a></li><li><a href=\"#\" id=\"" + reportId + "\"><h2>Report</h2></a><a href=\"#\" data-icon=\"clock\" class=\"orange\"></a></li><li data-theme=\"a\"><h2 href=\"\" data-transition=\"slide\" data-theme=\"c\" data-native-menu = \"false\">La prochaine alerte pour la " + id + " sera dans  " + jour + " jours.</h2></li></ul></div>"
+    var collapseItem = "<div id=\"collapsible" + id + "\" data-role=\"collapsible\" data-collapsed=\"true\" data-theme=\"a|b\" data-mini=\"true\"><h5 id=\"Alert" + id + "\" data-theme=\"b\" class=\"ui-btn ui-btn-b ui-icon-alert ui-btn-icon-right\">" + id + " </h5><ul data-role=\"listview\" data-inset=\"true\" data-divider-theme=\"a\"> <li><a href=\"#\"><h2>Acquittement</h2></a><a id=\"" + acquitId +"\" name=\"maintenance\" href=\"#\" data-icon=\"check\" class=\"green\"></a></li><li><a href=\"#\"><h2>Report</h2></a><a id=\"" + reportId +"\" name=\"maintenance\" href=\"#\" data-icon=\"clock\" class=\"orange\"></a></li><li data-theme=\"a\"><h2 href=\"\" data-transition=\"slide\" data-theme=\"c\" data-native-menu = \"false\">La prochaine alerte pour la " + id + " sera dans  " + period + " jours.</h2></li></ul></div>";
 
-    $("#collapsible").append( collapseItem );
+
+    if ($("#collapsible").children().length == 0) {
+      $("#collapsible").append(collapseItem);
+    } else {
+      $("#collapsible").append(collapseItem).collapsibleset('refresh');
+    }
 
     console.log("acquitId : " + acquitId);
     var myButtonAcquit = document.getElementById(acquitId);
-    myButtonAcquit.addEventListener('click', function(){
-      acquittement(acquitId);
+    myButtonAcquit.addEventListener('click', function(srcElement){
+      acquit(acquitId, srcElement);
     });
 
     var myButtonReport = document.getElementById(reportId);
     console.log("reportId : " + reportId);
-    myButtonReport.addEventListener('click', function(){
-      report(reportId);
+    myButtonReport.addEventListener('click', function(srcElement){
+      report(reportId, srcElement);
     });
+
+    $('#collapsible').collapsibleset().trigger('create'); 
+
 }
 
 /**
- * Indique qu'une maintenance est à faire (et potentiellment à acquitter si elle est faite).
+ * @brief removeMaintenanceActivated.
+ * @details Supprime un item dans la liste des maintenances.
+ *  
+ * @param id 
+ * @param name
+ * @param period
+ */
+function removeMaintenanceActivated(id, name, period)
+{
+    var myId = "collapsible" + id;
+    var myElement = document.getElementById(myId);
+
+    myElement.remove();
+
+}
+
+/**
+ * Indique qu'une maintenance est à faire (et potentiellement à acquitter si elle est faite).
  *  
  * @param id 
  * @param message
  */
-function maintenanceAFaire(id, message)
+function maintenanceToBeDone(id, message)
 {
   var alertId = "Alert" + id; 
   var el = document.getElementById(alertId);
 
-   el.className = "ui-btn ui-icon-alert ui-btn-icon-right"; 
-   alert("Ajout message !!!");
-   addMessage(id, message);
+  el.className = "ui-btn ui-icon-alert ui-btn-icon-right"; 
+  addMessage(id, message);
 
 
 }
 
 /**
- * Acquitte une maintenance.
+ * @brief acquittement.
+ * @details Acquitte une maintenance.
  *  
  * @param id 
+ * @param srcElement
  */
-function acquittement(id)
+function acquit(id, srcElement)
 {
   var split = "Alert" + id.slice(6);
   var el = document.getElementById(split);
@@ -484,54 +522,96 @@ function acquittement(id)
   console.log("L'id de la maintenance à acquittée est : " + id);
   console.log("L'id splité de la maintenance à acquittée est : " + split);
 
-  if (el.className !== "ui-btn ui-icon-alert ui-btn-icon-right") {
-      el.className = "ui-btn ui-icon-alert ui-btn-icon-right"; 
-      alert("La maintenance n'est pas à faire !");
-  } else { // Aquitemment fait!
+  if (el.className == "ui-btn ui-icon-alert ui-btn-icon-right") { // Si la maintenance est à faire, on acquit!
       el.className = "ui-btn"; 
       removeMessage(id);
+  } else {
+      el.className = "ui-btn ui-icon-alert ui-btn-icon-right"; 
+      addMessage(id, message);
+  }
+  $("#collapsible").collapsibleset('refresh');
+  //$('#collapsible').collapsibleset();
+  manageSocket(srcElement);
+}
+
+/**
+ * @brief report.
+ * @details Reporte une maintenance.
+ *  
+ * @param id
+ * @param srcElement
+ */
+function report(id, srcElement)
+{
+      
+  var deferment = window.prompt('Duree de report en heures: ', 0);
+  var deferment_pattern = '^([0-9]+[0-9])|[1-9]$';
+  var regx = new RegExp(deferment_pattern, 'g');
+  var testBool = regx.test(deferment);
+
+  console.log("testBool: "+testBool+"  deferment: "+deferment);
+  
+  if (testBool){
+    removeMessage(id);
+    manageSocket(srcElement, deferment);
+  } else {
+    report(id, srcElement);
   }
 }
 
 /**
- * Reporte une maintenance.
+ * @brief activerMaintenance.
+ * @details Active/desactive une maintenance.
  *  
  * @param id 
+ * @param srcElement
  */
-function report(id)
-{
-  //pop-up à implémener.
-  var el = document.getElementById(id);
-  console.log("L'id de la maintenance à faire est : " + id);
-
-  // Aquitemment fait!
-  el.className = ""; 
-  removeMessage(id);
-}
-
-/**
- * Active/desactive une maintenance.
- *  
- * @param id 
- */
-function activerMaintenance(id)
+function activateMaintenance(id, srcElement)
 {
   alert("\"activate\" à besoin d'etre implémenter !!!");
+  var jsonString = localStorage.getItem(id.slice(5));
+  console.log("mon id : " + id.slice(5) + " ma chaine de charactère : " + jsonString);
+
+  var jsonObject = JSON.parse(jsonString);
+  console.log(jsonObject);
+
+  storageContains("all");
+
+  if (jsonObject.state == 0) {
+      jsonObject.state = 1;
+      /* On ajoute l'item correspondant à la page 4.*/
+      addMaintenanceActivated(jsonObject.id, jsonObject.name, jsonObject.period);
+  } else {
+      jsonObject.state = 0;
+      /* On supprime l'item correspondant à la page 4.*/
+      removeMaintenanceActivated(jsonObject.id);
+  }
+
+  var myString = JSON.stringify(jsonObject);
+  localStorage.setItem(jsonObject.id, myString);
+  manageSocket(srcElement, 1);
 }
 
 /**
- * Change la couleur d'une maintenance.
+ * @brief changerColor.
+ * @details Change la couleur d'une maintenance.
  *  
  * @param id 
+ * @param srcElement
  */
-function changerCouleur(id)
+function changeColor(id, srcElement)
 {
   alert("\"changeColor\" à besoin d'etre implémenter !!!");
-
+  manageSocket(srcElement, "pink");
 }
 
-/* Fonction de debuf permettant de gérer les érreurs dans la console. */
-function return_error (err)
+/**
+ * @brief returnError.
+ * @details Fonction de debuf permettant de gérer les érreurs dans la console
+ * 
+ * @param  err
+ */ 
+function returnError(err)
 {
       message='Une erreur s\'est produite.\n\n';
       message+='Description : ' + err.message + err.cause + '\n\n';
@@ -540,7 +620,12 @@ function return_error (err)
 
 }
 
- 
+/**
+* @brief removeButton
+* @details Supprimer un bouton.
+* @author Jérome DeKerautem.
+* 
+*/
 function removeButton(){
   var confirm = window.confirm('Voulez-vous vraiment supprimer tous les groupes ?');
   if (confirm) {
@@ -550,4 +635,23 @@ function removeButton(){
       topDiv.removeChild(topDiv.lastChild);
     }
   }
+}
+
+function storageContains (what) 
+{
+    console.log("Le nombre d'élement stockés " + localStorage.length);
+    var elements;
+    var jsonelements;
+
+    if (what == "all") {
+      for (var i = 0; i < localStorage.length; i++){
+          elements += localStorage.getItem(localStorage.key(i));
+      }
+      jsonelements = JSON.stringify(elements);
+      console.log("Mon contenu stocké " + jsonelements);
+    } else {
+      console.log("Mon contenu stocké " + localStorage.getItem(what));
+    }
+
+
 }

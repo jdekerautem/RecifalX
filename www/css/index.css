@@ -50,6 +50,11 @@ h3
     margin-top: 5%;
 
 }
+.L
+{
+    margin-top: 5%;
+    margin-left: 10%;
+}
 
 .L div
 {
@@ -70,6 +75,40 @@ h3
 .L div div p
 {
     color:white;
+
+}
+
+.C 
+{
+    margin-left: 15%;
+}
+.C div div 
+{
+    display: inline-block;
+    text-align: center;
+    max-width: 40%;
+    height: 20%;
+    margin-top: 5%;
+
+}
+
+.C div div a
+{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    margin-top: 5%;
+
+}
+
+.C div div input
+{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    height: 20%;
+    margin-top: 5%;
 
 }
 
@@ -132,8 +171,9 @@ h3
 
 }
 
-.ui-btn-icon-right:focus, .ui-btn-icon-notext:focus
+.ui-btn-icon-left:after, .ui-btn-icon-right:after, .ui-btn-icon-top:after, .ui-btn-icon-bottom:after, .ui-btn-icon-notext:after
 {
+    display: none;
     background-color: rgba(255, 255, 0, 0.5);
 
 }
@@ -161,7 +201,7 @@ h3
 }
 
 #carre {
-    background-color: yellow;
+    background-color: #ff3333;
     width: 35px;
     height: 35px;
     border-radius: 10px;
