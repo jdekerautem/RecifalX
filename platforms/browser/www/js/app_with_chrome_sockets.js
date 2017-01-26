@@ -14,8 +14,6 @@ var SEND_TIMEOUT_MS             = 2;
 var TYPE_MAINTENANCE            = "N_MAINT";
 var TYPE_CONTROL                = "CTRL";
 var TYPE_TEMPERATURE            = "TEMP";
-var TYPE_ERROR                  = "ERROR";
-var TYPE_ALERT_MAINTENANCE      = "ALERT_C";
 
 var DEFAULT_IP_ADDRESS          = "192.168.10.1";
 var SERVER_PORT                 = "12345";
@@ -27,7 +25,6 @@ var STATE_IN_BETWEEN            = "rgb(33, 150, 243)";
 var OFF                         = 0;
 var ON                          = 1;
 
-/* Configurables par l'utilisateur ?... */
 var MAX_THRESHOLD_TEMP          = 25;
 var MIN_THRESHOLD_TEMP          = 20;
 
@@ -39,9 +36,7 @@ var ipAddress = "ipAddress", my_ipAddress;
 
 
 var app = {
-    /**
-     *  Application Constructor
-     */
+    // Application Constructor
     initialize: function() {
         this.bindEvents();
     },
@@ -58,8 +53,7 @@ var app = {
 
     /**
      * Ajout des listeners pour les évènements concernant le réseau et les boutons.
-     * Initialisation des noms des boutons-relais et des groupes si ceux-ci 
-     * existent dans le localStorage de la tablette.
+     * Initialisation des noms des boutons-relais si ceux-ci existent dans le localStorage de la tablette.
      */
     onDeviceReady: function() {
         /* Ajout des listeners sur les boutons des relais pour les évènements "click" */
@@ -79,21 +73,20 @@ var app = {
         /* Ajout listener sur le bouton des groupes */
         document.getElementsByName('a2')[0].addEventListener('click', searchForExceptionsInGroups);
 
-        // localStorage.clear(); // A enlever dans la version finale
+        localStorage.clear(); // A enlever dans la version finale. Ici juste pour effacer toute adresse IP
         
         /* Récupération des noms des relais personnalisés par l'utilisateur, s'ils existent dans le localStorage, et actualisation de l'innerHTML des balises <p> */
         /* Récupération du nombre de boutons à créer, de leur nom personnalisé et des relais qu'ils contiennent */
         if (typeof(Storage) !== "undefined" && localStorage.length > 0){
             console.log('localStorage exists, length > 0');
-
-            console.log(localStorage.getItem('relays'));
             
             /* Récupération des noms des boutons relais */
             var relay_storage = JSON.parse(localStorage.getItem('relays'));
             if (relay_storage != null) {
                 for (var i = 0; i < 16; i++) {
                     var relayTagName = 'r'+i;
-                    // relay_storage.relayTagName)  MARCHE PAS \\.// relay_storage[relayTagName]); MARCHE OK
+                    // console.log('relay_storage . :'+relay_storage.relayTagName);      //  MARCHE PAS
+                    // console.log('relay_storage [] :'+relay_storage[relayTagName]);    // MARCHE OK
                     if (relay_storage[relayTagName] != "") {
                         console.log("relay's name not empty");
 
@@ -118,7 +111,6 @@ var app = {
         /* SINON, création dans le local storage d'un objet contenant les id des boutons-relais avec un nom vide "" */
         else {
             console.log('localStorage doesnt exists');
-            Materialize.toast('localStorage doesnt exists', TOAST_DURATION_MS);
             var json_relays = {};
             var newName = "";
             for (var i = 0; i < 16; i++) {
@@ -130,19 +122,23 @@ var app = {
             console.log(localStorage.getItem('relays'));
         }
 
-        /* Actualisation des noms des relais dans la liste déroulante des groupes */
-        setOptions();
-
         /* Initialisation de la socket */
         manageSocket();
 
         /* Appel à la fonction permettant de vérifier périodiquement l'état de la socket */
-        checkSocketState();
+        // checkSocketState();
         
         displayTemperature();
+        
+        setColorRelayButton(100, 0);
+        setColorRelayButton(103, 0);
+        setColorRelayButton(110, 0);
+        setColorRelayButton(115, 0);
+        setColorRelayButton(100, 1);
     }
 };
 app.initialize();
+
 
 
 /**
@@ -175,15 +171,14 @@ function onChangeInner(inputNameButton){
     if (inputNameButton.srcElement.name == 'relayName') {
         /* Modification du nom dans le localStorage */
         var json_relays = JSON.parse(localStorage.getItem('relays'));
-        var idRelayButton = 'r'+inputNameButton.srcElement.id.slice(2);
-        json_relays[idRelayButton] = inputNameButton.srcElement.value;
+        var idRelayButton = inputNameButton.srcElement.id;
+        json_relays.idRelayButton = inputNameButton.srcElement.value;
 
         localStorage.setItem('relays', JSON.stringify(json_relays));
         console.log(localStorage.getItem('relays'));
 
         /* Modification de l'innerHTML de la balise <p> */
-        var p_tag = document.getElementById("in"+ inputNameButton.srcElement.id.slice(2));
-        console.log(p_tag);
+        var p_tag = document.getElementById("in"+ inputNameButton.srcElement.id.slice(1));
         p_tag.innerHTML = inputNameButton.srcElement.value;
     }
 
@@ -238,14 +233,14 @@ function retryConnectOnFailure(){
         // console.log(localStorage.getItem(ipAddress));
     }
 
-    var retryConnect = setTimeout(function() {
+    setTimeout(function() {
         if (!is_connected) {
             socket.open(
                   my_ipAddress, // IP Address of the server
                   SERVER_PORT,  // Port the server is listening on 
                   function() {
                     /* invoked after successful opening of socket */
-                    Materialize.toast('connexion à '+my_ipAddress+' reussie', LONG_TOAST_DURATION_MS);
+                    Materialize.toast('connexion à '+my_ipAddress+' reussie', TOAST_DURATION_MS);
                     is_connected = true;
                   },
                   function(errorMessage) {
@@ -261,29 +256,42 @@ function retryConnectOnFailure(){
                 }
             );
             if (countConnectionFailures > 50) {RETRY_DELAY_MS = 15000;}
-            if (countConnectionFailures > 100) {clearTimeout(retryConnect);}
             retryConnectOnFailure();
         }
     }, RETRY_DELAY_MS);
 }
 
 /**
- * Fonction gérant les envois et réceptions de messages via la socket, ainsi que sa création.
+ * Crée la socket et gère la communication avec le serveur.
+ * Crée les trames et les envoie lors dees appuis sur les boutons-relais ou boutons-maintenances.
  *
- * @param      {Event}  action             L'évènement qui a été déclenché
- * @param      {var}  optionalParameter    une couleur, ou une durée de report, ou un état d'activation
+ * @param      {DOM Object}  action  L'objet bouton du DOM qui a été cliqué
  */
-function manageSocket(action, optionalParameter){
+function manageSocket(action){
+    var is_successConnectFailure = false;
     if (!is_connected) {
         socket = new Socket();
         retryConnectOnFailure();
-        console.log('valeur is_connected: '+is_connected);
-        // is_connected = true; // TEST PURPOSE ONLY
+        console.log('valeur is_connected: '+is_connected);  // false
+        is_connected = true;
     
     /* SI la connexion est établie mais que l'action ne provient pas d'un bouton */
     /* on n'entrera jamais dans cette branche */
     } else if (typeof action === 'undefined'){
         console.log('typeof action == undefined');
+        /* Envoi d'une requête d'initialisation  ?... */
+
+        // setInterval(function(){
+        //     Materialize.toast('send json object', TOAST_DURATION_MS);
+        //     Materialize.toast('socket.state:  '+socket.state, TOAST_DURATION_MS);
+        //     var client_json = {"maintenance":[{"name":"ecumeur", "activated":"yes", "period":4, "color":"blue"},{"name":"pompe", "activated":"no", "period":5, "color":"orange"}]};
+        //     var dataString = JSON.stringify(client_json);
+        //     var data = new Uint8Array(dataString.length);
+        //     for (var i = 0; i < data.length; i++) {
+        //       data[i] = dataString.charCodeAt(i);
+        //     }
+        //     socket.write(data);    
+        // },10000);
 
     /* SI la connexion est établie et qu'un bouton-relais ou bouton-maintenance a été cliqué */
     } else {
@@ -291,7 +299,6 @@ function manageSocket(action, optionalParameter){
         var textJson;
         /* SI le bouton cliqué est un bouton-relais */
         if (action.srcElement.name.indexOf('r') === 0) {
-            console.log('CLICK bouton relais');
             var bouton = document.getElementsByName(action.srcElement.name)
             var bouton_background = window.getComputedStyle(bouton[0]).getPropertyValue('background-color');
             var nextState = (bouton_background == STATE_ON_COLOR) ? 0 : 1;
@@ -301,97 +308,66 @@ function manageSocket(action, optionalParameter){
             textJson = '{"action":"CTRL",'
                         +'"relay":'+relay_number+','
                         +'"state":'+nextState +'}';
+            console.log(JSON.parse(textJson));
+            Materialize.toast('textJson: '+textJson, TOAST_DURATION_MS);
 
-            // Materialize.toast('textJson: '+textJson, TOAST_DURATION_MS);
+            // setColorRelayButton(relay_number, nextState);  // TEST
         }
-        /* SI le bouton cliqué est le bouton d'activation d'une maintenance */
-        else if (action.srcElement.id.indexOf('Power') > -1){
-            console.log('CLICK bouton activation maintenance');
+        /* SI le bouton cliqué est un bouton-maintenance */
+        else if (action.srcElement.name.indexOf('m') > -1){
+            // if // selon le bouton, activation/desctivation OU couleur OU report/validation
+            // do things
+            
+            /* Validation ou report d'une maintenance. Le texte de la maintenance est enlevé de l'écran d'accueil */
+            // textJson = '{"action":"R_MAINT",'
+            //             +'"id":'+id+','
+            //             +'"report":'+postponeTime +'}';
 
-            textJson = '{"action":"A_MAINT",'
-                        +'"id":'+'"action.srcElement.id.slice(\'Power\'.length)"'+','
-                        +'"state":'+optionalParameter +'}';
+            /* Activation ou désactivation d'une maintenance. */
+            // textJson = '{"action":"A_MAINT",'
+            //             +'"id":'+id+','
+            //             +'"state":'+is_activated +'}';
+            
+            /* Changement de la couleur d'une maintenance */
+            // textJson = '{"action":"C_COLOR",'
+            //             +'"id":'+id+','
+            //             +'"color":'+newColor +'}';
         }
-        /* SI le bouton cliqué est le bouton d'acquittement d'une maintenance */
-        else if (action.srcElement.id.indexOf('Acquit') > -1){
-            console.log('CLICK bouton acquittement maintenance');
-
-            textJson = '{"action":"R_MAINT",'
-                        +'"id":'+'"action.srcElement.id.slice(\'Acquit\'.length)"'+','
-                        +'"report":-1}';
-        }
-        /* SI le bouton cliqué est le bouton de report d'une maintenance */
-        else if (action.srcElement.id.indexOf('Report') > -1){
-            console.log('CLICK bouton report maintenance');
-
-            textJson = '{"action":"R_MAINT",'
-                        +'"id":'+'"action.srcElement.id.slice(\'Report\'.length)"'+','
-                        +'"report":'+optionalParameter +'}';
-        }
-        /* SI le bouton cliqué est le bouton de changement de couleur d'une maintenance */
-        else if (action.srcElement.id.indexOf('Color') > -1){
-            console.log('CLICK bouton Couleur maintenance');
-
-            textJson = '{"action":"C_COLOR",'
-                        +'"id":'+'"action.srcElement.id.slice(\'Color\'.length)"'+','
-                        +'"color":'+'"'+optionalParameter +'"' +'}';
-        }
-
+            
         socket.write(string_To_uint8(textJson));
+            
     }
 
+    console.log('valeur is_connected fin: '+is_connected);      // false quand non connectée au début
     /* Invoked after new batch of data is received (typed array of bytes Uint8Array) */
     /*  Communications  SERVEUR --> CLIENT  */
     socket.onData = function(data) {
       dataToString = String.fromCharCode.apply(String, data);
-
-      /* Découpage du string en sous-string, chacun contenant un seul objet JSON. */
-      // var stringSliced;
-      // if (dataToString.)
+      dataToStringLength = dataToString.length;
 
       var jsonObject = JSON.parse(dataToString);
 
-      (typeof jsonObject === 'object') ? console.log('reception + jsonisation reussie') : Materialize.toast('echec lors de la jsonisation', 7000);
+      (typeof jsonObject === 'object') ? Materialize.toast('reception + jsonisation reussie', LONG_TOAST_DURATION_MS) : Materialize.toast('echec lors de la jsonisation', 7000);
 
       console.log(jsonObject);
     
       /* Trouver le type de la requête: maintenance, boutons relais, température */
         switch (jsonObject.action){
             case TYPE_MAINTENANCE:
-                /* Si la liste des maintenances dans menuConfig existe déjà, on ne la recrée pas */
-                if ($("#configCollapsible").children().length == 0) {
-                    Materialize.toast('Received N_MAINT from server', LONG_TOAST_DURATION_MS);
-                    addMaintenance(jsonObject);
+                Materialize.toast('Received N_MAINT from server', LONG_TOAST_DURATION_MS);
+                
 
-                    navigator.notification.vibrate([300, 70, 300, 70, 300]);
-                    navigator.notification.beep(1);
-                }
+                navigator.notification.vibrate([300, 70, 300, 70, 700]);
+                navigator.notification.beep(1);
                 break;
-
-            case TYPE_ALERT_MAINTENANCE:
-                Materialize.toast('Received alert maintenance', LONG_TOAST_DURATION_MS);
-                maintenanceToBeDone(jsonObject.id, "nom_de_la_maintenance");
-                navigator.notification.vibrate([300, 70, 300, 70, 750]);
-
             case TYPE_CONTROL:
                 /* Réponse du serveur pour savoir s'il faut changer la couleur du bouton-relais */
                 setColorRelayButton(jsonObject.relay, jsonObject.state);
                 Materialize.toast('Received CTRL from server', LONG_TOAST_DURATION_MS);
                 break;
-
             case TYPE_TEMPERATURE:
                 displayTemperature(dataTemperature);
                 break;
-
-            case TYPE_ERROR:
-                Materialize.toast(jsonObject.message, LONG_TOAST_DURATION_MS);
-                navigator.notification.vibrate([500,30,500]);
-                break;
-
-            case "N_RELAY":
-                Materialize.toast('Received N_RELAY from server', TOAST_DURATION_MS);
-                setColorRelayButton(jsonObject.relay, jsonObject.state);
-
             default: 
                 break;                
         }   
@@ -406,14 +382,11 @@ function manageSocket(action, optionalParameter){
     };
 }
 
-/**
- * Fonction responsable de la conversion d'un string en Uint8 Array pouvant être écrit dans la socket.
- *
- * @param      {string}      stringJSON  Le string contenant l'objet JSON à envoyer au serveur
- * @return     {Uint8Array}  Le tableau d'Uint8 prêt à être envoyé par la socket
- */
+function uint8_To_String(){
+
+}
+
 function string_To_uint8(stringJSON){
-    console.log(JSON.parse(stringJSON));
     var dataToSend = new Uint8Array(stringJSON.length);
     for (var i = 0; i < dataToSend.length; i++) {
       dataToSend[i] = stringJSON.charCodeAt(i);
@@ -449,19 +422,14 @@ function displayTemperature(dataTemperature){
     var tempDataPoints = [];
     var maxThreshold = [], minThreshold = [];
 
-    setInterval(function(){     // A enlever quand le serveur enverra des données de température
-        var randTemp = Math.floor(Math.random()*(27-18+1)+18); // A enlever également
+    setInterval(function(){
+        var randTemp = Math.floor(Math.random()*(27-18+1)+18);
         tempDataPoints.push([tempDataPoints.length, randTemp]);
         maxThreshold.push([maxThreshold.length, MAX_THRESHOLD_TEMP]);
         minThreshold.push([minThreshold.length, MIN_THRESHOLD_TEMP]);
 
         var temp_10 = tempDataPoints.slice(-10);
         var xaxis_min = temp_10[0][0];
-
-        var xaxis_min_full = 0;
-        if (tempDataPoints.length > 10) {
-            xaxis_min_full = tempDataPoints.length - 10;
-        }
 
         $.plot("#temperature", 
             [{
@@ -492,32 +460,23 @@ function displayTemperature(dataTemperature){
             }
         );
 
-        $.plot('#temperature_full',
-            [{
-                data: tempDataPoints,
-                color: "rgb(0, 51, 204)",
-                lines: { show: true, fill: true }
-            }],
-            {
-                grid: {
-                    backgroundColor: "#fff"
-                },
-                xaxis: {
-                    min: xaxis_min_full
-                },
-                yaxis: {
-                    min: 15,
-                    max: 30,
-                    ticks: 15,
-                    font:{
-                        size:13,
-                        style:"italic",
-                        family:"sans-serif",
-                        color:"#ddffdd"
-                    }
-                }
-            }
-        );
+        // $.plot('#temperature_full',
+        //     [{
+        //         data: tempDataPoints,
+        //         color: "rgb(0, 51, 204)",
+        //         lines: { show: true, fill: true }
+        //     }],
+        //     {
+        //         grid: {
+        //             backgroundColor: "#fff"
+        //         },
+        //         yaxis: {
+        //             min: 15,
+        //             max: 30,
+        //             ticks: 15
+        //         },
+        //     }
+        // );
     },LONG_TOAST_DURATION_MS);
 }
 
